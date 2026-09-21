@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#263238">
+<title>工事写真マネージャー V5</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#263238;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}
+header{background:#263238;color:white;padding:16px 16px 14px;position:sticky;top:0;z-index:5}header h1{font-size:20px;margin:0}header small{opacity:.8}
+main{max-width:720px;margin:auto;padding:14px}.card{background:white;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #00000010}
+label{display:block;font-weight:700;margin:10px 0 6px}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:12px;border:1px solid #ccd3d8;border-radius:10px;background:white}textarea{min-height:80px;resize:vertical}
+button{border:0;border-radius:10px;padding:12px 14px;font-weight:700;cursor:pointer}.primary{background:#263238;color:white}.secondary{background:#e9eef1;color:#263238}.danger{background:#ffebee;color:#c62828}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}.source button{min-height:52px}
+.check{display:flex;align-items:center;gap:10px;margin-top:12px}.check input{width:auto;transform:scale(1.25)}
+#preview{width:100%;border-radius:10px;background:#eceff1;display:none;margin-top:12px}.hint{font-size:13px;color:#607d8b;line-height:1.6}
+.photoItem{border-top:1px solid #e5e7e9;padding:12px 0}.photoItem:first-child{border-top:0}.photoItem img{width:100%;border-radius:9px;margin-top:8px;max-height:360px;object-fit:contain;background:#eee}.meta{font-size:14px;line-height:1.7}.badge{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:2px 7px;border-radius:99px;font-size:12px}
+.empty{color:#78909c;text-align:center;padding:24px 8px}
+.blackboard-preview{position:relative;display:none;margin-top:12px;border-radius:10px;overflow:hidden;background:#222}
+.blackboard-preview img{display:block;width:100%}
+.bb{position:absolute;right:3%;bottom:4%;width:44%;min-width:170px;background:#263238;color:#fff;border:3px solid #f5d76e;border-radius:3px;padding:8px;box-shadow:0 2px 6px #0008;font-weight:700}
+.bb div{border-bottom:1px solid #ffffff80;padding:3px 2px;font-size:12px}.bb div:last-child{border-bottom:0}
+footer{font-size:12px;color:#78909c;text-align:center;padding:12px}
+</style>
+</head>
+<body>
+<header><h1>📷 工事写真マネージャー V5</h1><small>撮影・写真選択・電子黒板をシンプルに</small></header>
+<main>
+<section class="card">
+<label>工事名</label><input id="project" placeholder="例：○○橋補修工事">
+<label>工種</label><input id="work" placeholder="例：断面修復工">
+<label class="check"><input type="checkbox" id="numbering"> 測定通し番号を付ける</label>
+<div class="hint">チェックすると測点が No.1、No.2…と自動で付きます。工種には番号を付けません。</div>
+<label>説明</label><textarea id="desc" placeholder="例：ハツリ状況"></textarea>
+</section>
+
+<section class="card source">
+<b>① 写真を選ぶ</b>
+<div class="row" style="margin-top:10px">
+<button class="primary" id="cameraBtn">📷 カメラで撮影</button>
+<button class="secondary" id="libraryBtn">🖼️ 写真から選択</button>
+</div>
+<input id="camera" type="file" accept="image/*" capture="environment" hidden>
+<input id="library" type="file" accept="image/*" hidden>
+<canvas id="canvas" hidden></canvas>
+<div class="hint" style="margin-top:10px">iPhoneのカメラ撮影と、すでに保存してある写真の選択を別々にできます。</div>
+</section>
+
+<section class="card">
+<b>② 電子黒板</b>
+<label class="check"><input type="checkbox" id="board" checked> 黒板を写真に自動で入れる</label>
+<div class="hint">工種・測点・説明から黒板を自動作成し、写真の右下に貼り付けます。</div>
+<div class="blackboard-preview" id="bbPreview"><img id="preview"><div class="bb" id="bbText"></div></div>
+<div class="row" style="margin-top:12px">
+<button class="primary" id="saveBtn" disabled>💾 写真を保存</button>
+<button class="secondary" id="clearBtn">クリア</button>
+</div>
+</section>
+
+<section class="card">
+<b>📖 写真帳プレビュー</b>
+<div id="book"></div>
+</section>
+<footer>この試作版は端末のブラウザ内に保存します。実運用では提出仕様に合わせた黒板レイアウト調整ができます。</footer>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+let photos=JSON.parse(localStorage.getItem('kp5_photos')||'[]');
+let next=Number(localStorage.getItem('kp5_next')||1);
+let selectedFile=null;
+
+function updateBoard(){
+  const n=$('numbering').checked ? `No.${next}` : '—';
+  $('bbText').innerHTML=`<div>工種　${esc($('work').value||'—')}</div><div>測点　${n}</div><div>説明　${esc($('desc').value||'—')}</div>`;
+  $('bbPreview').style.display=selectedFile?'block':'none';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function showFile(file){
+  selectedFile=file;$('saveBtn').disabled=false;
+  const r=new FileReader();r.onload=e=>{$('preview').src=e.target.result;updateBoard()};r.readAsDataURL(file);
+}
+$('cameraBtn').onclick=()=>$('camera').click();
+$('libraryBtn').onclick=()=>$('library').click();
+$('camera').onchange=e=>e.target.files[0]&&showFile(e.target.files[0]);
+$('library').onchange=e=>e.target.files[0]&&showFile(e.target.files[0]);
+['work','desc','numbering'].forEach(id=>$(id).addEventListener('input',updateBoard));
+$('numbering').addEventListener('change',updateBoard);
+
+async function composite(dataUrl, useBoard){
+  const img=new Image(); img.src=dataUrl; await new Promise(r=>img.onload=r);
+  const c=$('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight; const ctx=c.getContext('2d');
+  ctx.drawImage(img,0,0);
+  if(useBoard){
+    const w=Math.max(360,Math.floor(c.width*.42)), h=Math.max(130,Math.floor(c.height*.20));
+    const x=c.width-w-Math.floor(c.width*.035), y=c.height-h-Math.floor(c.height*.04);
+    ctx.fillStyle='#263238';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#f5d76e';ctx.lineWidth=Math.max(4,Math.floor(w*.012));ctx.strokeRect(x,y,w,h);
+    ctx.fillStyle='#fff';ctx.font=`bold ${Math.max(20,Math.floor(w*.065))}px sans-serif`;
+    const lines=[`工種　${$('work').value||'—'}`,`測点　${$('numbering').checked?'No.'+next:'—'}`,`説明　${$('desc').value||'—'}`];
+    const lh=h/4.1; lines.forEach((t,i)=>ctx.fillText(t,x+w*.05,y+lh*(i+1)));
+  }
+  return c.toDataURL('image/jpeg',.88);
+}
+$('saveBtn').onclick=async()=>{
+  if(!selectedFile)return;
+  const r=new FileReader();r.onload=async e=>{
+    const number=$('numbering').checked?next:null;
+    const img=await composite(e.target.result,$('board').checked);
+    photos.push({project:$('project').value||'未入力',work:$('work').value||'未入力',number,desc:$('desc').value||'',img,created:Date.now()});
+    if(number) next++;
+    localStorage.setItem('kp5_photos',JSON.stringify(photos));localStorage.setItem('kp5_next',next);
+    selectedFile=null;$('saveBtn').disabled=true;$('camera').value='';$('library').value='';$('preview').src='';$('bbPreview').style.display='none';
+    render();alert('写真を保存しました 👍');
+  };r.readAsDataURL(selectedFile);
+};
+$('clearBtn').onclick=()=>{selectedFile=null;$('saveBtn').disabled=true;$('camera').value='';$('library').value='';$('preview').src='';$('bbPreview').style.display='none'};
+function render(){
+  const b=$('book');if(!photos.length){b.innerHTML='<div class="empty">まだ写真がありません。</div>';return}
+  b.innerHTML=photos.map((p,i)=>`<div class="photoItem"><div class="meta"><b>工種</b>　${esc(p.work)}<br><b>測点</b>　${p.number?'No.'+p.number:'—'}<br><b>説明</b>　${esc(p.desc)} ${p.number?'<span class="badge">検測</span>':''}</div><img src="${p.img}"><button class="danger" style="margin-top:8px" onclick="del(${i})">削除</button></div>`).join('');
+}
+window.del=i=>{if(confirm('この写真を削除しますか？')){photos.splice(i,1);localStorage.setItem('kp5_photos',JSON.stringify(photos));render()}};
+render();updateBoard();
+</script>
+</body>
+</html>
