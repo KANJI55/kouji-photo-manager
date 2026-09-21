@@ -103,16 +103,28 @@ async function composite(dataUrl, useBoard){
   return c.toDataURL('image/jpeg',.88);
 }
 $('saveBtn').onclick=async()=>{
-  if(!selectedFile)return;
-  const r=new FileReader();r.onload=async e=>{
-    const number=$('numbering').checked?next:null;
+  if(!selectedFile)return alert('先に写真を選んでください');
+  const file=selectedFile;
+  const r=new FileReader();
+  r.onload=async e=>{
+    const number=$('numbering').checked;
     const img=await composite(e.target.result,$('board').checked);
-    photos.push({project:$('project').value||'未入力',work:$('work').value||'未入力',number,desc:$('desc').value||'',img,created:Date.now()});
-    if(number) next++;
-    localStorage.setItem('kp5_photos',JSON.stringify(photos));localStorage.setItem('kp5_next',next);
-    selectedFile=null;$('saveBtn').disabled=true;$('camera').value='';$('library').value='';$('preview').src='';$('bbPreview').style.display='none';
-    render();alert('写真を保存しました 👍');
-  };r.readAsDataURL(selectedFile);
+    photos.push({
+      project:$('project').value||'未入力',
+      work:$('work').value||'未入力',
+      desc:$('desc').value||'',
+      img:img
+    });
+    if(number)next++;
+    localStorage.setItem('kp5_photos',JSON.stringify(photos));
+    selectedFile=null;
+    $('saveBtn').disabled=true;
+    $('camera').value='';
+    $('library').value='';
+    render();
+    alert('写真を保存しました 👍');
+  };
+  r.readAsDataURL(file);
 };
 $('clearBtn').onclick=()=>{selectedFile=null;$('saveBtn').disabled=true;$('camera').value='';$('library').value='';$('preview').src='';$('bbPreview').style.display='none'};
 function render(){
