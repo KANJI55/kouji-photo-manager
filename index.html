@@ -7,119 +7,196 @@
 <title>工事写真マネージャー V5</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   background:#f3f5f6;
   color:#263238;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",
+  "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
 }
+
 header{
   background:#263238;
   color:#fff;
   padding:20px 16px;
 }
-header h1{margin:0;font-size:24px}
-header p{margin:6px 0 0;color:#d5dde1}
+
+header h1{
+  margin:0;
+  font-size:24px;
+}
+
+header small{
+  display:block;
+  margin-top:6px;
+  color:#d5dde0;
+  font-size:14px;
+}
 
 main{
   max-width:720px;
   margin:auto;
   padding:14px;
 }
+
 .card{
   background:#fff;
   border-radius:16px;
-  padding:16px;
+  padding:18px;
   margin-bottom:14px;
-  box-shadow:0 5px 18px #0000000d;
+  box-shadow:0 5px 16px rgba(0,0,0,.06);
 }
+
+h2{
+  margin:0 0 16px;
+  font-size:20px;
+}
+
 label{
   display:block;
   font-weight:700;
   margin:12px 0 6px;
 }
-input[type=text],textarea{
-  width:100%;
-  font-size:16px;
-  padding:12px;
-  border:1px solid #cfd8dc;
-  border-radius:10px;
-}
+
+input[type="text"],
 textarea{
-  min-height:90px;
+  width:100%;
+  border:1px solid #cbd5da;
+  border-radius:10px;
+  padding:12px;
+  font-size:16px;
+  background:#fff;
+}
+
+textarea{
+  min-height:100px;
   resize:vertical;
 }
+
 .row{
   display:flex;
-  gap:8px;
+  gap:10px;
+  flex-wrap:wrap;
 }
-.row>*{flex:1}
+
+.row > *{
+  flex:1;
+}
 
 button{
-  width:100%;
   border:0;
   border-radius:12px;
-  padding:14px 10px;
+  padding:14px 12px;
   font-size:17px;
   font-weight:700;
   cursor:pointer;
 }
+
 .primary{
   background:#263238;
-  color:#fff;
+  color:white;
 }
+
 .secondary{
   background:#e9eef1;
   color:#263238;
 }
+
+.danger{
+  background:#fff0f0;
+  color:#a52a2a;
+}
+
 button:disabled{
   opacity:.45;
 }
+
 .check{
   display:flex;
   align-items:center;
   gap:10px;
-  margin:8px 0;
+  font-weight:700;
+  margin:10px 0;
 }
+
 .check input{
   width:26px;
   height:26px;
 }
-.note{
+
+.help{
   color:#607d8b;
   line-height:1.7;
+  font-size:14px;
 }
+
 #preview{
   width:100%;
   display:none;
   border-radius:12px;
-  margin-top:12px;
+  margin-top:14px;
 }
+
 .photoItem{
   border-top:1px solid #e5e7e9;
-  padding:14px 0;
+  padding:16px 0;
 }
-.photoItem:first-child{border-top:0}
+
+.photoItem:first-child{
+  border-top:0;
+}
+
 .photoItem img{
   width:100%;
-  border-radius:10px;
-  margin-top:8px;
+  border-radius:12px;
+  display:block;
+  margin-bottom:10px;
 }
+
+.meta{
+  line-height:1.7;
+  font-size:14px;
+}
+
 .empty{
   color:#78909c;
   text-align:center;
-  padding:25px 5px;
+  padding:30px 10px;
 }
-.deleteBtn{
-  margin-top:8px;
-  background:#eceff1;
-}
+
 footer{
-  padding:20px;
-  text-align:center;
-  color:#78909c;
   font-size:12px;
+  color:#78909c;
+  text-align:center;
+  padding:20px 16px 35px;
+}
+
+#camera,
+#library{
+  display:none;
+}
+
+.status{
+  margin-top:10px;
+  padding:10px;
+  border-radius:8px;
+  display:none;
+}
+
+.status.ok{
+  display:block;
+  background:#eef8ef;
+  color:#2e6b35;
+}
+
+.status.error{
+  display:block;
+  background:#fff0f0;
+  color:#9c2525;
 }
 </style>
 </head>
@@ -128,274 +205,729 @@ footer{
 
 <header>
   <h1>📷 工事写真マネージャー V5</h1>
-  <p>撮影・写真選択・電子黒板をシンプルに</p>
+  <small>撮影・写真選択・電子黒板をシンプルに</small>
 </header>
 
 <main>
 
 <section class="card">
-  <label>工事名</label>
+  <h2>工事情報</h2>
+
+  <label for="project">工事名</label>
   <input id="project" type="text" placeholder="例：○○道路改良工事">
 
-  <label>工種</label>
-  <input id="work" type="text" placeholder="例：舗装工">
+  <label for="work">工種</label>
+  <input id="work" type="text" placeholder="例：側溝工">
 
-  <div class="check">
+  <label class="check">
     <input id="numbering" type="checkbox">
-    <label for="numbering" style="margin:0">
-      測点を自動で番号付けする
-    </label>
-  </div>
+    測点を自動で付ける
+  </label>
 
-  <p class="note">
+  <div class="help">
     チェックすると測点が No.1、No.2…と自動で付きます。
     工種には番号を付けません。
-  </p>
+  </div>
 
-  <label>説明</label>
+  <label for="desc">説明</label>
   <textarea id="desc" placeholder="例：ハツリ状況"></textarea>
 </section>
+
 
 <section class="card">
   <h2>① 写真を選ぶ</h2>
 
   <div class="row">
-    <button id="cameraBtn" class="primary">📷 カメラで撮影</button>
-    <button id="libraryBtn" class="secondary">🖼️ 写真から選択</button>
+    <button class="primary" id="cameraBtn">
+      📷 カメラで撮影
+    </button>
+
+    <button class="secondary" id="libraryBtn">
+      🖼️ 写真から選択
+    </button>
   </div>
 
-  <input id="camera" type="file" accept="image/*" capture="environment" hidden>
-  <input id="library" type="file" accept="image/*" hidden>
+  <input
+    id="camera"
+    type="file"
+    accept="image/*"
+    capture="environment"
+  >
+
+  <input
+    id="library"
+    type="file"
+    accept="image/*"
+  >
 
   <img id="preview" alt="選択した写真">
 
-  <p class="note">
-    iPhoneのカメラ撮影と、すでに保存してある写真の選択を別々にできます。
-  </p>
+  <div class="help">
+    iPhoneのカメラ撮影と、すでに保存してある写真の選択を
+    別々にできます。
+  </div>
 </section>
+
 
 <section class="card">
   <h2>② 電子黒板</h2>
 
-  <div class="check">
+  <label class="check">
     <input id="board" type="checkbox" checked>
-    <label for="board" style="margin:0">
-      黒板を写真に自動で入れる
-    </label>
+    黒板を写真に自動で入れる
+  </label>
+
+  <div class="help">
+    工種・測点・説明から黒板を自動作成し、
+    写真の右下へ貼り付けます。
   </div>
 
-  <p class="note">
-    工種・測点・説明から黒板を作成し、写真の右下に貼り付けます。
-  </p>
+  <br>
 
   <div class="row">
-    <button id="saveBtn" class="primary" disabled>💾 写真を保存</button>
-    <button id="clearBtn" class="secondary">クリア</button>
+    <button class="primary" id="saveBtn" disabled>
+      💾 写真を保存
+    </button>
+
+    <button class="secondary" id="clearBtn">
+      クリア
+    </button>
   </div>
+
+  <div id="status" class="status"></div>
 </section>
+
 
 <section class="card">
   <h2>📖 写真帳プレビュー</h2>
-  <div id="book"></div>
+  <div id="book">
+    <div class="empty">まだ写真がありません。</div>
+  </div>
 </section>
 
 </main>
 
 <footer>
-この試作版は端末のブラウザ内に保存します。
+  この試作版は端末のブラウザ内に保存します。<br>
+  実運用では提出仕様に合わせた黒板レイアウト調整ができます。
 </footer>
 
-<canvas id="canvas" hidden></canvas>
+
+<canvas id="canvas" style="display:none"></canvas>
+
 
 <script>
 const $ = id => document.getElementById(id);
 
 let selectedFile = null;
-let nextNumber = Number(localStorage.getItem("kp5_next") || 1);
+let nextNumber = 1;
 
-let photos = [];
-try{
-  photos = JSON.parse(localStorage.getItem("kp5_photos") || "[]");
-}catch(e){
-  photos = [];
+const DB_NAME = "kouji_photo_manager_v5";
+const DB_VERSION = 1;
+const STORE_NAME = "photos";
+
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req = indexedDB.open(DB_NAME,DB_VERSION);
+
+    req.onupgradeneeded = e=>{
+      const db = e.target.result;
+
+      if(!db.objectStoreNames.contains(STORE_NAME)){
+        db.createObjectStore(
+          STORE_NAME,
+          {
+            keyPath:"id",
+            autoIncrement:true
+          }
+        );
+      }
+    };
+
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+  });
 }
+
+
+async function addPhoto(photo){
+  const db = await openDB();
+
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(STORE_NAME,"readwrite");
+    const store = tx.objectStore(STORE_NAME);
+
+    const req = store.add(photo);
+
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = ()=>reject(req.error);
+
+    tx.oncomplete = ()=>db.close();
+  });
+}
+
+
+async function getPhotos(){
+  const db = await openDB();
+
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(STORE_NAME,"readonly");
+    const store = tx.objectStore(STORE_NAME);
+
+    const req = store.getAll();
+
+    req.onsuccess = ()=>{
+      resolve(req.result || []);
+    };
+
+    req.onerror = ()=>reject(req.error);
+
+    tx.oncomplete = ()=>db.close();
+  });
+}
+
+
+async function deletePhoto(id){
+  const db = await openDB();
+
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction(STORE_NAME,"readwrite");
+    const store = tx.objectStore(STORE_NAME);
+
+    const req = store.delete(id);
+
+    req.onsuccess = ()=>resolve();
+    req.onerror = ()=>reject(req.error);
+
+    tx.oncomplete = ()=>db.close();
+  });
+}
+
+
+function showStatus(message,type){
+  const el = $("status");
+  el.textContent = message;
+  el.className = "status " + type;
+}
+
+
+function clearStatus(){
+  const el = $("status");
+  el.textContent = "";
+  el.className = "status";
+}
+
+
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = ()=>reject(
+      new Error("写真の読み込みに失敗しました")
+    );
+
+    reader.readAsDataURL(file);
+  });
+}
+
+
+function loadImage(src){
+  return new Promise((resolve,reject)=>{
+    const img = new Image();
+
+    img.onload = ()=>resolve(img);
+    img.onerror = ()=>reject(
+      new Error("画像を開けませんでした")
+    );
+
+    img.src = src;
+  });
+}
+
+
+function canvasToBlob(canvas){
+  return new Promise((resolve,reject)=>{
+    canvas.toBlob(
+      blob=>{
+        if(blob){
+          resolve(blob);
+        }else{
+          reject(
+            new Error("画像の作成に失敗しました")
+          );
+        }
+      },
+      "image/jpeg",
+      0.82
+    );
+  });
+}
+
+
+async function makePhoto(file,useBoard){
+  const dataUrl = await fileToDataURL(file);
+  const img = await loadImage(dataUrl);
+
+  const canvas = $("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const MAX = 1800;
+
+  let width = img.naturalWidth;
+  let height = img.naturalHeight;
+
+  if(width > MAX || height > MAX){
+    const scale = Math.min(
+      MAX / width,
+      MAX / height
+    );
+
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.drawImage(
+    img,
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  if(useBoard){
+    const boardWidth = Math.max(
+      300,
+      Math.floor(width * 0.43)
+    );
+
+    const boardHeight = Math.max(
+      150,
+      Math.floor(height * 0.23)
+    );
+
+    const margin = Math.max(
+      12,
+      Math.floor(width * 0.025)
+    );
+
+    const x =
+      width -
+      boardWidth -
+      margin;
+
+    const y =
+      height -
+      boardHeight -
+      margin;
+
+
+    ctx.fillStyle = "rgba(38,50,56,.94)";
+    ctx.fillRect(
+      x,
+      y,
+      boardWidth,
+      boardHeight
+    );
+
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = Math.max(
+      2,
+      Math.floor(width * 0.002)
+    );
+
+    ctx.strokeRect(
+      x,
+      y,
+      boardWidth,
+      boardHeight
+    );
+
+
+    const work =
+      $("work").value.trim() ||
+      "未入力";
+
+    const desc =
+      $("desc").value.trim() ||
+      "未入力";
+
+    const number =
+      $("numbering").checked
+      ? "No." + nextNumber
+      : "－";
+
+
+    const lines = [
+      "工種　" + work,
+      "測点　" + number,
+      "説明　" + desc
+    ];
+
+
+    const fontSize = Math.max(
+      16,
+      Math.floor(boardHeight / 6)
+    );
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font =
+      "bold " +
+      fontSize +
+      "px sans-serif";
+
+    ctx.textBaseline = "middle";
+
+
+    const lineHeight =
+      boardHeight / 4;
+
+    lines.forEach((text,index)=>{
+      ctx.fillText(
+        text,
+        x + margin,
+        y +
+        lineHeight *
+        (index + 1),
+        boardWidth -
+        margin * 2
+      );
+    });
+  }
+
+
+  return await canvasToBlob(canvas);
+}
+
 
 function showFile(file){
   if(!file) return;
 
   selectedFile = file;
-  $("saveBtn").disabled = false;
+
+  clearStatus();
 
   const reader = new FileReader();
 
-  reader.onload = function(e){
+  reader.onload = e=>{
     $("preview").src = e.target.result;
     $("preview").style.display = "block";
   };
 
   reader.readAsDataURL(file);
+
+  $("saveBtn").disabled = false;
 }
 
-$("cameraBtn").addEventListener("click", function(){
+
+$("cameraBtn").onclick = ()=>{
   $("camera").click();
-});
+};
 
-$("libraryBtn").addEventListener("click", function(){
+
+$("libraryBtn").onclick = ()=>{
   $("library").click();
-});
+};
 
-$("camera").addEventListener("change", function(){
-  if(this.files && this.files[0]){
-    showFile(this.files[0]);
+
+$("camera").addEventListener(
+  "change",
+  e=>{
+    if(e.target.files[0]){
+      showFile(e.target.files[0]);
+    }
   }
-});
+);
 
-$("library").addEventListener("change", function(){
-  if(this.files && this.files[0]){
-    showFile(this.files[0]);
+
+$("library").addEventListener(
+  "change",
+  e=>{
+    if(e.target.files[0]){
+      showFile(e.target.files[0]);
+    }
   }
-});
+);
 
-function readFile(file){
-  return new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-    reader.onload = ()=>resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
 
-function loadImage(src){
-  return new Promise((resolve,reject)=>{
-    const img = new Image();
-    img.onload = ()=>resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-}
+$("clearBtn").onclick = ()=>{
+  selectedFile = null;
 
-async function makePhoto(file,useBoard,number){
-  const dataUrl = await readFile(file);
-  const img = await loadImage(dataUrl);
+  $("camera").value = "";
+  $("library").value = "";
 
-  const canvas = $("canvas");
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
+  $("preview").src = "";
+  $("preview").style.display = "none";
 
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(img,0,0);
+  $("saveBtn").disabled = true;
 
-  if(useBoard){
-    const w = Math.max(300,Math.floor(canvas.width * .44));
-    const h = Math.max(150,Math.floor(canvas.height * .22));
+  clearStatus();
+};
 
-    const x = canvas.width - w - Math.floor(canvas.width * .03);
-    const y = canvas.height - h - Math.floor(canvas.height * .04);
 
-    ctx.fillStyle = "#263238";
-    ctx.fillRect(x,y,w,h);
-
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = Math.max(2,canvas.width/700);
-    ctx.strokeRect(x,y,w,h);
-
-    const work = $("work").value || "未入力";
-    const desc = $("desc").value || "";
-    const point = number ? "No." + number : "－";
-
-    const lines = [
-      "工種　" + work,
-      "測点　" + point,
-      "説明　" + desc
-    ];
-
-    ctx.fillStyle = "#ffffff";
-    ctx.textBaseline = "middle";
-    ctx.font = "bold " + Math.max(18,Math.floor(h/7)) + "px sans-serif";
-
-    const lineHeight = h/3;
-
-    lines.forEach((text,i)=>{
-      ctx.fillText(
-        text,
-        x + Math.floor(w*.05),
-        y + lineHeight*(i+.5),
-        Math.floor(w*.9)
-      );
-    });
-  }
-
-  return canvas.toDataURL("image/jpeg",0.88);
-}
-
-$("saveBtn").addEventListener("click", async function(){
-
+$("saveBtn").onclick = async ()=>{
   if(!selectedFile){
-    alert("先に写真を選んでください");
+    alert("写真を選んでください。");
     return;
   }
 
-  const file = selectedFile;
+  const button = $("saveBtn");
 
-  $("saveBtn").disabled = true;
-  $("saveBtn").textContent = "保存中…";
+  button.disabled = true;
+  button.textContent = "保存中…";
+
+  clearStatus();
 
   try{
-    const useNumber = $("numbering").checked;
-    const number = useNumber ? nextNumber : null;
 
-    const finishedImage = await makePhoto(
-      file,
-      $("board").checked,
-      number
+    const blob = await makePhoto(
+      selectedFile,
+      $("board").checked
     );
 
-    photos.push({
-      project:$("project").value || "未入力",
-      work:$("work").value || "未入力",
-      desc:$("desc").value || "",
+
+    const number =
+      $("numbering").checked
+      ? nextNumber
+      : null;
+
+
+    await addPhoto({
+      project:
+        $("project").value.trim() ||
+        "未入力",
+
+      work:
+        $("work").value.trim() ||
+        "未入力",
+
+      desc:
+        $("desc").value.trim() ||
+        "",
+
       number:number,
-      img:finishedImage,
-      date:new Date().toLocaleString("ja-JP")
+
+      createdAt:
+        new Date().toISOString(),
+
+      image:blob
     });
 
-    if(useNumber){
+
+    if(number !== null){
       nextNumber++;
-      localStorage.setItem("kp5_next",String(nextNumber));
     }
 
-    localStorage.setItem("kp5_photos",JSON.stringify(photos));
 
     selectedFile = null;
+
     $("camera").value = "";
     $("library").value = "";
+
     $("preview").src = "";
     $("preview").style.display = "none";
 
-    render();
+    await render();
 
-    alert("写真を保存しました 👍");
+    showStatus(
+      "写真を保存しました 👍",
+      "ok"
+    );
 
   }catch(error){
+
     console.error(error);
-    alert("写真の保存中にエラーが発生しました。別の写真でもう一度お試しください。");
+
+    showStatus(
+      "保存できませんでした：" +
+      (error.message || "不明なエラー"),
+      "error"
+    );
+
+    alert(
+      "写真の保存中にエラーが発生しました。\n\n" +
+      (error.message || "")
+    );
+
   }finally{
-    $("saveBtn").textContent = "💾 写真を保存";
-    $("saveBtn").disabled = selectedFile === null;
+
+    button.textContent =
+      "💾 写真を保存";
+
+    button.disabled =
+      !selectedFile;
   }
-});
+};
 
-$("clearBtn").addEventListener("click", function(){
-  selectedFile = null;
-  $("camera").value = "";
-  $("library").value = "";
-  $("preview").src = "";
-  $("preview").style.display = "none";
-  $("saveBtn").disabled = true;
-});
 
-function escapeHtml(text){
-  return String(text)
+async function render(){
+
+  const book = $("book");
+
+  try{
+
+    const photos =
+      await getPhotos();
+
+
+    if(!photos.length){
+
+      book.innerHTML =
+        '<div class="empty">' +
+        'まだ写真がありません。' +
+        '</div>';
+
+      nextNumber = 1;
+      return;
+    }
+
+
+    let maxNumber = 0;
+
+    photos.forEach(p=>{
+      if(
+        typeof p.number === "number" &&
+        p.number > maxNumber
+      ){
+        maxNumber = p.number;
+      }
+    });
+
+    nextNumber =
+      maxNumber + 1;
+
+
+    book.innerHTML = "";
+
+
+    const reversed =
+      [...photos].reverse();
+
+
+    reversed.forEach(photo=>{
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "photoItem";
+
+
+      const img =
+        document.createElement("img");
+
+      const url =
+        URL.createObjectURL(
+          photo.image
+        );
+
+      img.src = url;
+
+      img.onload = ()=>{
+        URL.revokeObjectURL(url);
+      };
+
+
+      const meta =
+        document.createElement("div");
+
+      meta.className =
+        "meta";
+
+
+      const numberText =
+        photo.number
+        ? "No." + photo.number
+        : "－";
+
+
+      meta.innerHTML =
+        "<b>工事名：</b>" +
+        escapeHTML(photo.project) +
+        "<br>" +
+
+        "<b>工種：</b>" +
+        escapeHTML(photo.work) +
+        "<br>" +
+
+        "<b>測点：</b>" +
+        escapeHTML(numberText) +
+        "<br>" +
+
+        "<b>説明：</b>" +
+        escapeHTML(photo.desc || "－");
+
+
+      const del =
+        document.createElement("button");
+
+      del.className =
+        "danger";
+
+      del.style.marginTop =
+        "10px";
+
+      del.textContent =
+        "この写真を削除";
+
+
+      del.onclick =
+        async ()=>{
+
+          if(
+            !confirm(
+              "この写真を削除しますか？"
+            )
+          ){
+            return;
+          }
+
+          try{
+
+            await deletePhoto(
+              photo.id
+            );
+
+            await render();
+
+          }catch(error){
+
+            alert(
+              "削除できませんでした。"
+            );
+
+          }
+        };
+
+
+      item.appendChild(img);
+      item.appendChild(meta);
+      item.appendChild(del);
+
+      book.appendChild(item);
+    });
+
+  }catch(error){
+
+    console.error(error);
+
+    book.innerHTML =
+      '<div class="empty">' +
+      '写真帳を読み込めませんでした。' +
+      '</div>';
+  }
+}
+
+
+function escapeHTML(value){
+
+  return String(value)
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;")
@@ -403,40 +935,6 @@ function escapeHtml(text){
     .replaceAll("'","&#39;");
 }
 
-function render(){
-  const book = $("book");
-
-  if(!photos.length){
-    book.innerHTML = '<div class="empty">まだ写真がありません。</div>';
-    return;
-  }
-
-  book.innerHTML = photos.map((p,i)=>{
-    const point = p.number ? "No."+p.number : "－";
-
-    return `
-      <div class="photoItem">
-        <strong>${escapeHtml(p.project)}</strong>
-        <div>工種：${escapeHtml(p.work)}</div>
-        <div>測点：${escapeHtml(point)}</div>
-        <div>説明：${escapeHtml(p.desc)}</div>
-        <div>${escapeHtml(p.date || "")}</div>
-        <img src="${p.img}" alt="工事写真">
-        <button class="deleteBtn" onclick="deletePhoto(${i})">
-          この写真を削除
-        </button>
-      </div>
-    `;
-  }).join("");
-}
-
-window.deletePhoto = function(index){
-  if(!confirm("この写真を削除しますか？")) return;
-
-  photos.splice(index,1);
-  localStorage.setItem("kp5_photos",JSON.stringify(photos));
-  render();
-};
 
 render();
 </script>
