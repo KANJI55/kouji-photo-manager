@@ -7,9 +7,7 @@
 <title>工事写真マネージャー V5</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -25,10 +23,7 @@ header{
   padding:20px 16px;
 }
 
-header h1{
-  margin:0;
-  font-size:24px;
-}
+header h1{margin:0;font-size:24px}
 
 header small{
   display:block;
@@ -51,10 +46,7 @@ main{
   box-shadow:0 5px 16px rgba(0,0,0,.06);
 }
 
-h2{
-  margin:0 0 16px;
-  font-size:20px;
-}
+h2{margin:0 0 16px;font-size:20px}
 
 label{
   display:block;
@@ -62,8 +54,7 @@ label{
   margin:12px 0 6px;
 }
 
-input[type="text"],
-textarea{
+input[type="text"],textarea{
   width:100%;
   border:1px solid #cbd5da;
   border-radius:10px;
@@ -73,7 +64,8 @@ textarea{
 }
 
 textarea{
-  min-height:100px;
+  min-height:160px;
+  line-height:1.5;
   resize:vertical;
 }
 
@@ -83,9 +75,7 @@ textarea{
   flex-wrap:wrap;
 }
 
-.row > *{
-  flex:1;
-}
+.row>*{flex:1}
 
 button{
   border:0;
@@ -96,24 +86,10 @@ button{
   cursor:pointer;
 }
 
-.primary{
-  background:#263238;
-  color:white;
-}
-
-.secondary{
-  background:#e9eef1;
-  color:#263238;
-}
-
-.danger{
-  background:#fff0f0;
-  color:#a52a2a;
-}
-
-button:disabled{
-  opacity:.45;
-}
+.primary{background:#263238;color:#fff}
+.secondary{background:#e9eef1;color:#263238}
+.danger{background:#fff0f0;color:#a52a2a}
+button:disabled{opacity:.45}
 
 .check{
   display:flex;
@@ -123,10 +99,7 @@ button:disabled{
   margin:10px 0;
 }
 
-.check input{
-  width:26px;
-  height:26px;
-}
+.check input{width:26px;height:26px}
 
 .help{
   color:#607d8b;
@@ -146,9 +119,7 @@ button:disabled{
   padding:16px 0;
 }
 
-.photoItem:first-child{
-  border-top:0;
-}
+.photoItem:first-child{border-top:0}
 
 .photoItem img{
   width:100%;
@@ -160,6 +131,7 @@ button:disabled{
 .meta{
   line-height:1.7;
   font-size:14px;
+  white-space:pre-wrap;
 }
 
 .empty{
@@ -175,10 +147,7 @@ footer{
   padding:20px 16px 35px;
 }
 
-#camera,
-#library{
-  display:none;
-}
+#camera,#library{display:none}
 
 .status{
   margin-top:10px;
@@ -204,227 +173,186 @@ footer{
 <body>
 
 <header>
-  <h1>📷 工事写真マネージャー V5</h1>
-  <small>撮影・写真選択・電子黒板をシンプルに</small>
+<h1>📷 工事写真マネージャー V5</h1>
+<small>撮影・写真選択・電子黒板をシンプルに</small>
 </header>
 
 <main>
 
 <section class="card">
-  <h2>工事情報</h2>
+<h2>工事情報</h2>
 
-  <label for="project">工事名</label>
-  <input id="project" type="text" placeholder="例：○○道路改良工事">
+<label for="project">工事名</label>
+<input id="project" type="text" placeholder="例：○○道路改良工事">
 
-  <label for="work">工種</label>
-  <input id="work" type="text" placeholder="例：側溝工">
+<label for="work">工種</label>
+<input id="work" type="text" placeholder="例：側溝工">
 
-  <label class="check">
-    <input id="numbering" type="checkbox">
-    測点を自動で付ける
-  </label>
+<label class="check">
+<input id="numbering" type="checkbox">
+測点を自動で付ける
+</label>
 
-  <div class="help">
-    チェックすると測点が No.1、No.2…と自動で付きます。
-    工種には番号を付けません。
-  </div>
+<div class="help">
+チェックすると測点が No.1、No.2…と自動で付きます。
+工種には番号を付けません。
+</div>
 
-  <label for="desc">説明</label>
-  <textarea id="desc" placeholder="例：ハツリ状況"></textarea>
+<label for="desc">説明（6行）</label>
+<textarea id="desc" rows="6"
+placeholder="1行目
+2行目
+3行目
+4行目
+5行目
+6行目"></textarea>
+
 </section>
 
-
 <section class="card">
-  <h2>① 写真を選ぶ</h2>
+<h2>① 写真を選ぶ</h2>
 
-  <div class="row">
-    <button class="primary" id="cameraBtn">
-      📷 カメラで撮影
-    </button>
+<div class="row">
+<button class="primary" id="cameraBtn">📷 カメラで撮影</button>
+<button class="secondary" id="libraryBtn">🖼️ 写真から選択</button>
+</div>
 
-    <button class="secondary" id="libraryBtn">
-      🖼️ 写真から選択
-    </button>
-  </div>
+<input id="camera" type="file" accept="image/*" capture="environment">
+<input id="library" type="file" accept="image/*">
 
-  <input
-    id="camera"
-    type="file"
-    accept="image/*"
-    capture="environment"
-  >
+<img id="preview" alt="選択した写真">
 
-  <input
-    id="library"
-    type="file"
-    accept="image/*"
-  >
-
-  <img id="preview" alt="選択した写真">
-
-  <div class="help">
-    iPhoneのカメラ撮影と、すでに保存してある写真の選択を
-    別々にできます。
-  </div>
+<div class="help">
+iPhoneのカメラ撮影と、すでに保存してある写真の選択を別々にできます。
+</div>
 </section>
 
-
 <section class="card">
-  <h2>② 電子黒板</h2>
+<h2>② 電子黒板</h2>
 
-  <label class="check">
-    <input id="board" type="checkbox" checked>
-    黒板を写真に自動で入れる
-  </label>
+<label class="check">
+<input id="board" type="checkbox" checked>
+黒板を写真に自動で入れる
+</label>
 
-  <div class="help">
-    工種・測点・説明から黒板を自動作成し、
-    写真の右下へ貼り付けます。
-  </div>
+<div class="help">
+工事名・工種・測点・説明6行から電子黒板を作成し、
+写真の右下へ貼り付けます。
+</div>
 
-  <br>
+<br>
 
-  <div class="row">
-    <button class="primary" id="saveBtn" disabled>
-      💾 写真を保存
-    </button>
+<div class="row">
+<button class="primary" id="saveBtn" disabled>💾 写真を保存</button>
+<button class="secondary" id="clearBtn">クリア</button>
+</div>
 
-    <button class="secondary" id="clearBtn">
-      クリア
-    </button>
-  </div>
-
-  <div id="status" class="status"></div>
+<div id="status" class="status"></div>
 </section>
 
-
 <section class="card">
-  <h2>📖 写真帳プレビュー</h2>
-  <div id="book">
-    <div class="empty">まだ写真がありません。</div>
-  </div>
+<h2>📖 写真帳プレビュー</h2>
+<div id="book">
+<div class="empty">まだ写真がありません。</div>
+</div>
 </section>
 
 </main>
 
 <footer>
-  この試作版は端末のブラウザ内に保存します。<br>
-  実運用では提出仕様に合わせた黒板レイアウト調整ができます。
+この試作版は端末のブラウザ内に保存します。<br>
+実運用では提出仕様に合わせた黒板レイアウト調整ができます。
 </footer>
-
 
 <canvas id="canvas" style="display:none"></canvas>
 
-
 <script>
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-let selectedFile = null;
-let nextNumber = 1;
+let selectedFile=null;
+let nextNumber=1;
 
-const DB_NAME = "kouji_photo_manager_v5";
-const DB_VERSION = 1;
-const STORE_NAME = "photos";
-
+const DB_NAME="kouji_photo_manager_v5";
+const DB_VERSION=1;
+const STORE_NAME="photos";
 
 function openDB(){
   return new Promise((resolve,reject)=>{
-    const req = indexedDB.open(DB_NAME,DB_VERSION);
+    const req=indexedDB.open(DB_NAME,DB_VERSION);
 
-    req.onupgradeneeded = e=>{
-      const db = e.target.result;
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
 
       if(!db.objectStoreNames.contains(STORE_NAME)){
         db.createObjectStore(
           STORE_NAME,
-          {
-            keyPath:"id",
-            autoIncrement:true
-          }
+          {keyPath:"id",autoIncrement:true}
         );
       }
     };
 
-    req.onsuccess = ()=>resolve(req.result);
-    req.onerror = ()=>reject(req.error);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
   });
 }
-
 
 async function addPhoto(photo){
-  const db = await openDB();
+  const db=await openDB();
 
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE_NAME,"readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const tx=db.transaction(STORE_NAME,"readwrite");
+    const req=tx.objectStore(STORE_NAME).add(photo);
 
-    const req = store.add(photo);
-
-    req.onsuccess = ()=>resolve(req.result);
-    req.onerror = ()=>reject(req.error);
-
-    tx.oncomplete = ()=>db.close();
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+    tx.oncomplete=()=>db.close();
   });
 }
-
 
 async function getPhotos(){
-  const db = await openDB();
+  const db=await openDB();
 
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE_NAME,"readonly");
-    const store = tx.objectStore(STORE_NAME);
+    const tx=db.transaction(STORE_NAME,"readonly");
+    const req=tx.objectStore(STORE_NAME).getAll();
 
-    const req = store.getAll();
-
-    req.onsuccess = ()=>{
-      resolve(req.result || []);
-    };
-
-    req.onerror = ()=>reject(req.error);
-
-    tx.oncomplete = ()=>db.close();
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+    tx.oncomplete=()=>db.close();
   });
 }
-
 
 async function deletePhoto(id){
-  const db = await openDB();
+  const db=await openDB();
 
   return new Promise((resolve,reject)=>{
-    const tx = db.transaction(STORE_NAME,"readwrite");
-    const store = tx.objectStore(STORE_NAME);
+    const tx=db.transaction(STORE_NAME,"readwrite");
+    const req=tx.objectStore(STORE_NAME).delete(id);
 
-    const req = store.delete(id);
-
-    req.onsuccess = ()=>resolve();
-    req.onerror = ()=>reject(req.error);
-
-    tx.oncomplete = ()=>db.close();
+    req.onsuccess=()=>resolve();
+    req.onerror=()=>reject(req.error);
+    tx.oncomplete=()=>db.close();
   });
 }
 
-
 function showStatus(message,type){
-  const el = $("status");
-  el.textContent = message;
-  el.className = "status " + type;
+  const el=$("status");
+  el.textContent=message;
+  el.className="status "+type;
 }
-
 
 function clearStatus(){
-  const el = $("status");
-  el.textContent = "";
-  el.className = "status";
+  const el=$("status");
+  el.textContent="";
+  el.className="status";
 }
-
 
 function fileToDataURL(file){
   return new Promise((resolve,reject)=>{
-    const reader = new FileReader();
+    const reader=new FileReader();
 
-    reader.onload = ()=>resolve(reader.result);
-    reader.onerror = ()=>reject(
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(
       new Error("写真の読み込みに失敗しました")
     );
 
@@ -432,20 +360,18 @@ function fileToDataURL(file){
   });
 }
 
-
 function loadImage(src){
   return new Promise((resolve,reject)=>{
-    const img = new Image();
+    const img=new Image();
 
-    img.onload = ()=>resolve(img);
-    img.onerror = ()=>reject(
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(
       new Error("画像を開けませんでした")
     );
 
-    img.src = src;
+    img.src=src;
   });
 }
-
 
 function canvasToBlob(canvas){
   return new Promise((resolve,reject)=>{
@@ -454,9 +380,7 @@ function canvasToBlob(canvas){
         if(blob){
           resolve(blob);
         }else{
-          reject(
-            new Error("画像の作成に失敗しました")
-          );
+          reject(new Error("画像の作成に失敗しました"));
         }
       },
       "image/jpeg",
@@ -466,68 +390,103 @@ function canvasToBlob(canvas){
 }
 
 
-async function makePhoto(file,useBoard){
-  const dataUrl = await fileToDataURL(file);
-  const img = await loadImage(dataUrl);
+/*
+  長すぎる文字だけ末尾を「…」にする。
+  横方向への文字圧縮は行わない。
+*/
+function fitText(ctx,text,maxWidth){
+  let value=String(text||"");
 
-  const canvas = $("canvas");
-  const ctx = canvas.getContext("2d");
-
-  const MAX = 1800;
-
-  let width = img.naturalWidth;
-  let height = img.naturalHeight;
-
-  if(width > MAX || height > MAX){
-    const scale = Math.min(
-      MAX / width,
-      MAX / height
-    );
-
-    width = Math.round(width * scale);
-    height = Math.round(height * scale);
+  if(ctx.measureText(value).width<=maxWidth){
+    return value;
   }
 
-  canvas.width = width;
-  canvas.height = height;
+  while(
+    value.length>0 &&
+    ctx.measureText(value+"…").width>maxWidth
+  ){
+    value=value.slice(0,-1);
+  }
 
-  ctx.drawImage(
-    img,
-    0,
-    0,
-    width,
-    height
-  );
+  return value+"…";
+}
+
+
+async function makePhoto(file,useBoard){
+
+  const dataUrl=await fileToDataURL(file);
+  const img=await loadImage(dataUrl);
+
+  const canvas=$("canvas");
+  const ctx=canvas.getContext("2d");
+
+  const MAX=1800;
+
+  let width=img.naturalWidth;
+  let height=img.naturalHeight;
+
+  if(width>MAX||height>MAX){
+    const scale=Math.min(
+      MAX/width,
+      MAX/height
+    );
+
+    width=Math.round(width*scale);
+    height=Math.round(height*scale);
+  }
+
+  canvas.width=width;
+  canvas.height=height;
+
+  ctx.drawImage(img,0,0,width,height);
 
 
   if(useBoard){
-    const boardWidth = Math.max(
-      360,
-      Math.floor(width * 0.38)
-    );
 
-    const boardHeight = Math.max(
-      240,
-      Math.floor(height * 0.30)
-    );
+    /*
+      ============================
+      日本向け 電子黒板
+      ============================
+    */
 
-    const margin = Math.max(
+    const margin=Math.max(
       12,
-      Math.floor(width * 0.025)
+      Math.floor(width*0.02)
     );
 
-    const x =
-      width -
-      boardWidth -
-      margin;
+    /*
+      黒板は横長になりすぎない比率。
+    */
+    let boardWidth=Math.floor(width*0.43);
 
-    const y =
-      height -
-      boardHeight -
-      margin;
+    boardWidth=Math.min(
+      boardWidth,
+      width-margin*2
+    );
+
+    /*
+      高さは幅から決定。
+      説明6行分を常に確保する。
+    */
+    let boardHeight=Math.floor(boardWidth*0.82);
+
+    if(boardHeight>height-margin*2){
+      boardHeight=height-margin*2;
+      boardWidth=Math.floor(boardHeight/0.82);
+    }
+
+    const x=
+      width-boardWidth-margin;
+
+    const y=
+      height-boardHeight-margin;
 
 
-    ctx.fillStyle = "rgba(38,50,56,.94)";
+    /*
+      工事黒板らしい緑色
+    */
+    ctx.fillStyle="#176b45";
+
     ctx.fillRect(
       x,
       y,
@@ -536,12 +495,21 @@ async function makePhoto(file,useBoard){
     );
 
 
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = Math.max(
+    /*
+      線の太さ
+    */
+    const lineWidth=Math.max(
       2,
-      Math.floor(width * 0.002)
+      Math.floor(boardWidth*0.006)
     );
 
+    ctx.strokeStyle="#ffffff";
+    ctx.lineWidth=lineWidth;
+
+
+    /*
+      外枠
+    */
     ctx.strokeRect(
       x,
       y,
@@ -550,55 +518,214 @@ async function makePhoto(file,useBoard){
     );
 
 
-    const work =
-      $("work").value.trim() ||
-      "未入力";
+    /*
+      データ
+    */
+    const project=
+      $("project").value.trim()||"未入力";
 
-    const desc =
-      $("desc").value.trim() ||
-      "未入力";
+    const work=
+      $("work").value.trim()||"未入力";
 
-    const number =
+    const number=
       $("numbering").checked
-      ? "No." + nextNumber
+      ? "No."+nextNumber
       : "－";
 
 
-    const lines = [
-      "工種　" + work,
-      "測点　" + number,
-      "説明　" + desc
-    ];
+    /*
+      説明は必ず6行固定。
+      入力されていない行は空欄。
+      自動折り返しはしない。
+    */
+    const rawDesc=$("desc").value;
+
+    const descLines=
+      rawDesc.split(/\r?\n/).slice(0,6);
+
+    while(descLines.length<6){
+      descLines.push("");
+    }
 
 
-    const fontSize = Math.max(
-      16,
-      Math.floor(boardHeight / 6)
+    /*
+      左側の項目欄の幅
+    */
+    const labelWidth=
+      Math.floor(boardWidth*0.25);
+
+    /*
+      ★重要
+      縦線はこれ1本だけ。
+      上から下まで同じX座標。
+    */
+    const verticalX=
+      x+labelWidth;
+
+    ctx.beginPath();
+    ctx.moveTo(verticalX,y);
+    ctx.lineTo(verticalX,y+boardHeight);
+    ctx.stroke();
+
+
+    /*
+      全体を9段に分ける。
+
+      1 工事名
+      2 工種
+      3 測点
+      4 説明1
+      5 説明2
+      6 説明3
+      7 説明4
+      8 説明5
+      9 説明6
+    */
+    const rowHeight=
+      boardHeight/9;
+
+
+    /*
+      横線。
+      工事名・工種・測点の下は全面。
+      説明欄内は右側だけ。
+    */
+
+    for(let i=1;i<=8;i++){
+
+      const lineY=
+        y+rowHeight*i;
+
+      ctx.beginPath();
+
+      if(i<=3){
+        ctx.moveTo(x,lineY);
+      }else{
+        ctx.moveTo(verticalX,lineY);
+      }
+
+      ctx.lineTo(
+        x+boardWidth,
+        lineY
+      );
+
+      ctx.stroke();
+    }
+
+
+    /*
+      文字設定
+    */
+    const fontSize=Math.max(
+      13,
+      Math.floor(rowHeight*0.43)
     );
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font =
-      "bold " +
-      fontSize +
-      "px sans-serif";
+    ctx.fillStyle="#ffffff";
 
-    ctx.textBaseline = "middle";
+    ctx.font=
+      "bold "+fontSize+
+      'px "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';
+
+    ctx.textBaseline="middle";
+
+    const pad=Math.max(
+      6,
+      Math.floor(boardWidth*0.018)
+    );
 
 
-    const lineHeight =
-      boardHeight / 4;
+    /*
+      左項目名
+    */
+    const labelX=
+      x+pad;
 
-    lines.forEach((text,index)=>{
+    const labelMaxWidth=
+      labelWidth-pad*2;
+
+    const valueX=
+      verticalX+pad;
+
+    const valueMaxWidth=
+      boardWidth-labelWidth-pad*2;
+
+
+    /*
+      各行中央のY座標
+    */
+    function centerY(row){
+      return y+
+        rowHeight*row+
+        rowHeight/2;
+    }
+
+
+    /*
+      左列
+    */
+    ctx.fillText(
+      fitText(ctx,"工事名",labelMaxWidth),
+      labelX,
+      centerY(0)
+    );
+
+    ctx.fillText(
+      fitText(ctx,"工　種",labelMaxWidth),
+      labelX,
+      centerY(1)
+    );
+
+    ctx.fillText(
+      fitText(ctx,"測　点",labelMaxWidth),
+      labelX,
+      centerY(2)
+    );
+
+    ctx.fillText(
+      fitText(ctx,"説　明",labelMaxWidth),
+      labelX,
+      centerY(3)
+    );
+
+
+    /*
+      右列
+    */
+    ctx.fillText(
+      fitText(ctx,project,valueMaxWidth),
+      valueX,
+      centerY(0)
+    );
+
+    ctx.fillText(
+      fitText(ctx,work,valueMaxWidth),
+      valueX,
+      centerY(1)
+    );
+
+    ctx.fillText(
+      fitText(ctx,number,valueMaxWidth),
+      valueX,
+      centerY(2)
+    );
+
+
+    /*
+      説明6行
+    */
+    for(let i=0;i<6;i++){
+
       ctx.fillText(
-        text,
-        x + margin,
-        y +
-        lineHeight *
-        (index + 1),
-        boardWidth -
-        margin * 2
+        fitText(
+          ctx,
+          descLines[i],
+          valueMaxWidth
+        ),
+        valueX,
+        centerY(3+i)
       );
-    });
+    }
   }
 
 
@@ -607,31 +734,30 @@ async function makePhoto(file,useBoard){
 
 
 function showFile(file){
-  if(!file) return;
+  if(!file)return;
 
-  selectedFile = file;
+  selectedFile=file;
 
   clearStatus();
 
-  const reader = new FileReader();
+  const reader=new FileReader();
 
-  reader.onload = e=>{
-    $("preview").src = e.target.result;
-    $("preview").style.display = "block";
+  reader.onload=e=>{
+    $("preview").src=e.target.result;
+    $("preview").style.display="block";
   };
 
   reader.readAsDataURL(file);
 
-  $("saveBtn").disabled = false;
+  $("saveBtn").disabled=false;
 }
 
 
-$("cameraBtn").onclick = ()=>{
+$("cameraBtn").onclick=()=>{
   $("camera").click();
 };
 
-
-$("libraryBtn").onclick = ()=>{
+$("libraryBtn").onclick=()=>{
   $("library").click();
 };
 
@@ -656,59 +782,62 @@ $("library").addEventListener(
 );
 
 
-$("clearBtn").onclick = ()=>{
-  selectedFile = null;
+$("clearBtn").onclick=()=>{
 
-  $("camera").value = "";
-  $("library").value = "";
+  selectedFile=null;
 
-  $("preview").src = "";
-  $("preview").style.display = "none";
+  $("camera").value="";
+  $("library").value="";
 
-  $("saveBtn").disabled = true;
+  $("preview").src="";
+  $("preview").style.display="none";
+
+  $("saveBtn").disabled=true;
 
   clearStatus();
 };
 
 
-$("saveBtn").onclick = async ()=>{
+$("saveBtn").onclick=async()=>{
+
   if(!selectedFile){
     alert("写真を選んでください。");
     return;
   }
 
-  const button = $("saveBtn");
+  const button=$("saveBtn");
 
-  button.disabled = true;
-  button.textContent = "保存中…";
+  button.disabled=true;
+  button.textContent="保存中…";
 
   clearStatus();
 
   try{
 
-    const blob = await makePhoto(
+    const blob=await makePhoto(
       selectedFile,
       $("board").checked
     );
 
 
-    const number =
+    const number=
       $("numbering").checked
       ? nextNumber
       : null;
 
 
     await addPhoto({
+
       project:
-        $("project").value.trim() ||
+        $("project").value.trim()||
         "未入力",
 
       work:
-        $("work").value.trim() ||
+        $("work").value.trim()||
         "未入力",
 
       desc:
-        $("desc").value.trim() ||
+        $("desc").value.trim()||
         "",
 
       number:number,
@@ -720,20 +849,22 @@ $("saveBtn").onclick = async ()=>{
     });
 
 
-    if(number !== null){
+    if(number!==null){
       nextNumber++;
     }
 
 
-    selectedFile = null;
+    selectedFile=null;
 
-    $("camera").value = "";
-    $("library").value = "";
+    $("camera").value="";
+    $("library").value="";
 
-    $("preview").src = "";
-    $("preview").style.display = "none";
+    $("preview").src="";
+    $("preview").style.display="none";
+
 
     await render();
+
 
     showStatus(
       "写真を保存しました 👍",
@@ -745,22 +876,22 @@ $("saveBtn").onclick = async ()=>{
     console.error(error);
 
     showStatus(
-      "保存できませんでした：" +
-      (error.message || "不明なエラー"),
+      "保存できませんでした："+
+      (error.message||"不明なエラー"),
       "error"
     );
 
     alert(
-      "写真の保存中にエラーが発生しました。\n\n" +
-      (error.message || "")
+      "写真の保存中にエラーが発生しました。\n\n"+
+      (error.message||"")
     );
 
   }finally{
 
-    button.textContent =
+    button.textContent=
       "💾 写真を保存";
 
-    button.disabled =
+    button.disabled=
       !selectedFile;
   }
 };
@@ -768,142 +899,143 @@ $("saveBtn").onclick = async ()=>{
 
 async function render(){
 
-  const book = $("book");
+  const book=$("book");
 
   try{
 
-    const photos =
+    const photos=
       await getPhotos();
 
 
     if(!photos.length){
 
-      book.innerHTML =
-        '<div class="empty">' +
-        'まだ写真がありません。' +
+      book.innerHTML=
+        '<div class="empty">'+
+        'まだ写真がありません。'+
         '</div>';
 
-      nextNumber = 1;
+      nextNumber=1;
       return;
     }
 
 
-    let maxNumber = 0;
+    let maxNumber=0;
 
     photos.forEach(p=>{
+
       if(
-        typeof p.number === "number" &&
-        p.number > maxNumber
+        typeof p.number==="number" &&
+        p.number>maxNumber
       ){
-        maxNumber = p.number;
+        maxNumber=p.number;
       }
     });
 
-    nextNumber =
-      maxNumber + 1;
+
+    nextNumber=
+      maxNumber+1;
 
 
-    book.innerHTML = "";
+    book.innerHTML="";
 
 
-    const reversed =
+    const reversed=
       [...photos].reverse();
 
 
     reversed.forEach(photo=>{
 
-      const item =
+      const item=
         document.createElement("div");
 
-      item.className =
+      item.className=
         "photoItem";
 
 
-      const img =
+      const img=
         document.createElement("img");
 
-      const url =
+
+      const url=
         URL.createObjectURL(
           photo.image
         );
 
-      img.src = url;
+      img.src=url;
 
-      img.onload = ()=>{
+      img.onload=()=>{
         URL.revokeObjectURL(url);
       };
 
 
-      const meta =
+      const meta=
         document.createElement("div");
 
-      meta.className =
+      meta.className=
         "meta";
 
 
-      const numberText =
+      const numberText=
         photo.number
-        ? "No." + photo.number
+        ? "No."+photo.number
         : "－";
 
 
-      meta.innerHTML =
-        "<b>工事名：</b>" +
-        escapeHTML(photo.project) +
-        "<br>" +
+      meta.innerHTML=
+        "<b>工事名：</b>"+
+        escapeHTML(photo.project)+
+        "<br>"+
 
-        "<b>工種：</b>" +
-        escapeHTML(photo.work) +
-        "<br>" +
+        "<b>工種：</b>"+
+        escapeHTML(photo.work)+
+        "<br>"+
 
-        "<b>測点：</b>" +
-        escapeHTML(numberText) +
-        "<br>" +
+        "<b>測点：</b>"+
+        escapeHTML(numberText)+
+        "<br>"+
 
-        "<b>説明：</b>" +
-        escapeHTML(photo.desc || "－");
+        "<b>説明：</b>"+
+        escapeHTML(photo.desc||"－");
 
 
-      const del =
+      const del=
         document.createElement("button");
 
-      del.className =
+      del.className=
         "danger";
 
-      del.style.marginTop =
+      del.style.marginTop=
         "10px";
 
-      del.textContent =
+      del.textContent=
         "この写真を削除";
 
 
-      del.onclick =
-        async ()=>{
+      del.onclick=async()=>{
 
-          if(
-            !confirm(
-              "この写真を削除しますか？"
-            )
-          ){
-            return;
-          }
+        if(
+          !confirm(
+            "この写真を削除しますか？"
+          )
+        ){
+          return;
+        }
 
-          try{
+        try{
 
-            await deletePhoto(
-              photo.id
-            );
+          await deletePhoto(
+            photo.id
+          );
 
-            await render();
+          await render();
 
-          }catch(error){
+        }catch(error){
 
-            alert(
-              "削除できませんでした。"
-            );
-
-          }
-        };
+          alert(
+            "削除できませんでした。"
+          );
+        }
+      };
 
 
       item.appendChild(img);
@@ -917,9 +1049,9 @@ async function render(){
 
     console.error(error);
 
-    book.innerHTML =
-      '<div class="empty">' +
-      '写真帳を読み込めませんでした。' +
+    book.innerHTML=
+      '<div class="empty">'+
+      '写真帳を読み込めませんでした。'+
       '</div>';
   }
 }
