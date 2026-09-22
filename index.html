@@ -711,22 +711,37 @@ async function makePhoto(file,useBoard){
     );
 
 
-    /*
-      説明6行
-    */
-    for(let i=0;i<6;i++){
+/*
+  説明6行
+  「実測」で始まる行だけ赤文字にする
+*/
+for(let i=0;i<6;i++){
 
-      ctx.fillText(
-        fitText(
-          ctx,
-          descLines[i],
-          valueMaxWidth
-        ),
-        valueX,
-        centerY(3+i)
-      );
-    }
+  const line=descLines[i].trim();
+
+  if(line.startsWith("実測")){
+    ctx.fillStyle="#ff3333";
+  }else{
+    ctx.fillStyle="#ffffff";
   }
+
+  ctx.fillText(
+    fitText(
+      ctx,
+      descLines[i],
+      valueMaxWidth
+    ),
+    valueX,
+    centerY(3+i)
+  );
+}
+
+/*
+  文字色を白へ戻す
+*/
+ctx.fillStyle="#ffffff";
+
+}
 
 
   return await canvasToBlob(canvas);
