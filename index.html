@@ -239,7 +239,12 @@ iPhoneのカメラ撮影と、すでに保存してある写真の選択を別�
 工事名・工種・測点・説明6行から電子黒板を作成し、
 写真の右下へ貼り付けます。
 </div>
-
+<div style="margin-top:14px;">
+  <b>黒板サイズ</b>
+  <button type="button" id="boardMinus">−</button>
+  <span id="boardSize">100%</span>
+  <button type="button" id="boardPlus">＋</button>
+</div>
 <br>
 
 <div class="row">
@@ -457,7 +462,7 @@ async function makePhoto(file,useBoard){
     /*
       黒板は横長になりすぎない比率。
     */
-    let boardWidth=Math.floor(width*0.34);
+    let boardWidth=Math.floor(width*0.34*boardScale);
 
     boardWidth=Math.min(
       boardWidth,
@@ -1082,7 +1087,27 @@ function escapeHTML(value){
     .replaceAll("'","&#39;");
 }
 
+let boardScale = 1.0;
 
+const boardMinus = document.getElementById("boardMinus");
+const boardPlus = document.getElementById("boardPlus");
+const boardSize = document.getElementById("boardSize");
+
+function updateBoardSize(){
+  boardSize.textContent = Math.round(boardScale * 100) + "%";
+}
+
+boardMinus.addEventListener("click", ()=>{
+  boardScale = Math.max(0.7, boardScale - 0.1);
+  updateBoardSize();
+});
+
+boardPlus.addEventListener("click", ()=>{
+  boardScale = Math.min(1.0, boardScale + 0.1);
+  updateBoardSize();
+});
+
+updateBoardSize();
 render();
 </script>
 
