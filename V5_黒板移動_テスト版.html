@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#263238">
+<title>工事写真マネージャー V5 測点・プレビュー改良版</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f3f5f6;
+  color:#263238;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",
+  "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+}
+
+header{
+  background:#263238;
+  color:#fff;
+  padding:20px 16px;
+}
+
+header h1{margin:0;font-size:24px}
+
+header small{
+  display:block;
+  margin-top:6px;
+  color:#d5dde0;
+  font-size:14px;
+}
+
+main{
+  max-width:720px;
+  margin:auto;
+  padding:14px;
+}
+
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 5px 16px rgba(0,0,0,.06);
+}
+
+h2{margin:0 0 16px;font-size:20px}
+
+label{
+  display:block;
+  font-weight:700;
+  margin:12px 0 6px;
+}
+
+input[type="text"],textarea{
+  width:100%;
+  border:1px solid #cbd5da;
+  border-radius:10px;
+  padding:12px;
+  font-size:16px;
+  background:#fff;
+}
+
+textarea{
+  min-height:160px;
+  line-height:1.5;
+  resize:vertical;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.row>*{flex:1}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:14px 12px;
+  font-size:17px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{background:#263238;color:#fff}
+.secondary{background:#e9eef1;color:#263238}
+.danger{background:#fff0f0;color:#a52a2a}
+button:disabled{opacity:.45}
+
+.check{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+  margin:10px 0;
+}
+
+.check input{width:26px;height:26px}
+
+.help{
+  color:#607d8b;
+  line-height:1.7;
+  font-size:14px;
+}
+
+#preview{
+  width:100%;
+  display:none;
+  border-radius:12px;
+  margin-top:14px;
+}
+
+.photoItem{
+  border-top:1px solid #e5e7e9;
+  padding:16px 0;
+}
+
+.photoItem:first-child{border-top:0}
+
+.photoItem img{
+  width:100%;
+  border-radius:12px;
+  display:block;
+  margin-bottom:10px;
+}
+
+.meta{
+  line-height:1.7;
+  font-size:14px;
+  white-space:pre-wrap;
+}
+
+.empty{
+  color:#78909c;
+  text-align:center;
+  padding:30px 10px;
+}
+
+footer{
+  font-size:12px;
+  color:#78909c;
+  text-align:center;
+  padding:20px 16px 35px;
+}
+
+#camera,#library{display:none}
+
+.status{
+  margin-top:10px;
+  padding:10px;
+  border-radius:8px;
+  display:none;
+}
+
+.status.ok{
+  display:block;
+  background:#eef8ef;
+  color:#2e6b35;
+}
+
+.status.error{
+  display:block;
+  background:#fff0f0;
+  color:#9c2525;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📷 工事写真マネージャー V5 測点・プレビュー改良版</h1>
+<small>撮影・写真選択・電子黒板をシンプルに</small>
+</header>
+
+<main>
+
+<section class="card">
+<h2>工事情報</h2>
+
+<label for="project">工事名</label>
+<input id="project" type="text" placeholder="例：○○道路改良工事">
+
+<label for="work">工種</label>
+<input id="work" type="text" placeholder="例：側溝工">
+
+<label for="pointName">測点名</label>
+<input id="pointName" type="text" placeholder="例：A1、床版">
+<label for="pointNumber">検測番号（①、②…）</label>
+<div class="row" style="align-items:center">
+<button type="button" class="secondary" id="pointMinus">−</button>
+<input id="pointNumber" type="number" min="1" max="99" value="1" style="width:90px;padding:12px;font-size:18px;text-align:center">
+<button type="button" class="secondary" id="pointPlus">＋</button>
+</div>
+<label>自動連番</label>
+<div class="row"><label class="check"><input type="radio" name="autoNumber" value="yes"> YES（保存後に進む）</label><label class="check"><input type="radio" name="autoNumber" value="no" checked> NO（固定）</label></div>
+<div class="help">測点：<strong id="pointDisplay">A1 ①</strong>　同じ番号で複数枚撮影する場合はNOを選びます。</div>
+
+<label for="desc">説明（6行）</label>
+<textarea id="desc" rows="6"
+placeholder="1行目
+2行目
+3行目
+4行目
+5行目
+6行目"></textarea>
+
+</section>
+
+<section class="card">
+<h2>① 写真を選ぶ</h2>
+
+<div class="row">
+<button class="primary" id="cameraBtn">📷 カメラで撮影</button>
+<button class="secondary" id="libraryBtn">🖼️ 写真から選択</button>
+</div>
+
+<input id="camera" type="file" accept="image/*" capture="environment">
+<input id="library" type="file" accept="image/*">
+
+<img id="preview" alt="選択した写真">
+
+<div class="help">
+iPhoneのカメラ撮影と、すでに保存してある写真の選択を別々にできます。
+</div>
+</section>
+
+<section class="card">
+<h2>② 電子黒板</h2>
+
+<label class="check">
+<input id="board" type="checkbox" checked>
+黒板を写真に自動で入れる
+</label>
+
+<div class="help">
+工事名・工種・測点・説明6行から電子黒板を作成し、
+写真の右下へ貼り付けます。
+</div>
+<div style="margin-top:14px;">
+  <b>黒板サイズ</b>
+  <button type="button" id="boardMinus">−</button>
+  <span id="boardSize">100%</span>
+  <button type="button" id="boardPlus">＋</button>
+</div>
+<br>
+
+<button class="secondary" type="button" id="boardPreviewBtn">👁️ 電子黒板付き写真をプレビュー</button>
+<img id="boardPreview" alt="電子黒板付きの保存前プレビュー" style="display:none;width:100%;margin:12px 0;border-radius:12px;touch-action:none;cursor:grab;user-select:none" draggable="false">
+<div class="help">👆 プレビューの黒板を指やマウスでドラッグできます。位置は次の写真にも引き継がれます。</div>
+<div class="row" id="boardCorners" style="margin:10px 0">
+<button type="button" class="secondary" data-corner="tl">↖ 左上</button><button type="button" class="secondary" data-corner="tr">↗ 右上</button>
+<button type="button" class="secondary" data-corner="bl">↙ 左下</button><button type="button" class="secondary" data-corner="br">↘ 右下</button>
+</div>
+<div class="help">保存前に黒板の位置・文字・サイズを確認できます。入力を変更した場合は再度プレビューしてください。</div>
+<div class="row">
+<button class="primary" id="saveBtn" disabled>💾 写真を保存</button>
+<button class="secondary" id="clearBtn">クリア</button>
+</div>
+
+<div id="status" class="status"></div>
+</section>
+
+<section class="card">
+<h2>③ 写真をまとめて出力</h2>
+<p class="help">保存済みの写真を工種ごとのフォルダに分け、ZIPファイルで一括保存します。写真情報のCSVも同梱します。写真が多い場合は少し時間がかかります。</p>
+<button class="primary" id="exportZipBtn" type="button">📦 工種別ZIPを保存</button>
+<div id="exportStatus" class="status" role="status" aria-live="polite"></div>
+</section>
+
+<section class="card">
+<h2>📖 写真帳プレビュー</h2>
+<div id="book">
+<div class="empty">まだ写真がありません。</div>
+</div>
+</section>
+
+</main>
+
+<footer>
+この試作版は端末のブラウザ内に保存します。<br>
+実運用では提出仕様に合わせた黒板レイアウト調整ができます。
+</footer>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+<script>
+const $=id=>document.getElementById(id);
+
+let selectedFile=null;
+let nextNumber=1;
+const circled=n=>n>=1&&n<=20?String.fromCodePoint(0x2460+n-1):`(${n})`;
+const currentPointNumber=()=>Math.max(1,Math.min(99,Number($('pointNumber').value)||1));
+const pointText=()=>[ $('pointName').value.trim(),circled(currentPointNumber()) ].filter(Boolean).join(' ');
+function refreshPoint(){ $('pointNumber').value=currentPointNumber();$('pointDisplay').textContent=pointText();invalidatePreview(); }
+function invalidatePreview(){const p=$('boardPreview');if(p){p.style.display='none';p.removeAttribute('src');}}
+
+
+const DB_NAME="kouji_photo_manager_v5";
+const DB_VERSION=1;
+const STORE_NAME="photos";
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME,DB_VERSION);
+
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+
+      if(!db.objectStoreNames.contains(STORE_NAME)){
+        db.createObjectStore(
+          STORE_NAME,
+          {keyPath:"id",autoIncrement:true}
+        );
+      }
+    };
+
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+async function addPhoto(photo){
+  const db=await openDB();
+
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE_NAME,"readwrite");
+    const req=tx.objectStore(STORE_NAME).add(photo);
+
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+    tx.oncomplete=()=>db.close();
+  });
+}
+
+async function getPhotos(){
+  const db=await openDB();
+
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE_NAME,"readonly");
+    const req=tx.objectStore(STORE_NAME).getAll();
+
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+    tx.oncomplete=()=>db.close();
+  });
+}
+
+async function deletePhoto(id){
+  const db=await openDB();
+
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE_NAME,"readwrite");
+    const req=tx.objectStore(STORE_NAME).delete(id);
+
+    req.onsuccess=()=>resolve();
+    req.onerror=()=>reject(req.error);
+    tx.oncomplete=()=>db.close();
+  });
+}
+
+function showStatus(message,type){
+  const el=$("status");
+  el.textContent=message;
+  el.className="status "+type;
+}
+
+function clearStatus(){
+  const el=$("status");
+  el.textContent="";
+  el.className="status";
+}
+
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(
+      new Error("写真の読み込みに失敗しました")
+    );
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(
+      new Error("画像を開けませんでした")
+    );
+
+    img.src=src;
+  });
+}
+
+function canvasToBlob(canvas){
+  return new Promise((resolve,reject)=>{
+    canvas.toBlob(
+      blob=>{
+        if(blob){
+          resolve(blob);
+        }else{
+          reject(new Error("画像の作成に失敗しました"));
+        }
+      },
+      "image/jpeg",
+      0.82
+    );
+  });
+}
+
+
+/*
+  長すぎる文字だけ末尾を「…」にする。
+  横方向への文字圧縮は行わない。
+*/
+function fitText(ctx,text,maxWidth){
+  let value=String(text||"");
+
+  if(ctx.measureText(value).width<=maxWidth){
+    return value;
+  }
+
+  while(
+    value.length>0 &&
+    ctx.measureText(value+"…").width>maxWidth
+  ){
+    value=value.slice(0,-1);
+  }
+
+  return value+"…";
+}
+
+
+// 黒板の位置は写真内の比率で保存（端末内のみ）。
+let boardPosition={x:1,y:1};
+try{const stored=JSON.parse(localStorage.getItem('v5_board_position')||'null');if(stored&&Number.isFinite(stored.x)&&Number.isFinite(stored.y))boardPosition={x:Math.max(0,Math.min(1,stored.x)),y:Math.max(0,Math.min(1,stored.y))};}catch(e){}
+let boardBounds=null;
+function setBoardPosition(x,y){boardPosition={x:Math.max(0,Math.min(1,x)),y:Math.max(0,Math.min(1,y))};try{localStorage.setItem('v5_board_position',JSON.stringify(boardPosition));}catch(e){}}
+async function makePhoto(file,useBoard){
+
+  const dataUrl=await fileToDataURL(file);
+  const img=await loadImage(dataUrl);
+
+  const canvas=$("canvas");
+  const ctx=canvas.getContext("2d");
+
+  const MAX=1800;
+
+  let width=img.naturalWidth;
+  let height=img.naturalHeight;
+
+  if(width>MAX||height>MAX){
+    const scale=Math.min(
+      MAX/width,
+      MAX/height
+    );
+
+    width=Math.round(width*scale);
+    height=Math.round(height*scale);
+  }
+
+  canvas.width=width;
+  canvas.height=height;
+
+  ctx.drawImage(img,0,0,width,height);
+
+
+  if(useBoard){
+
+    /*
+      ============================
+      日本向け 電子黒板
+      ============================
+    */
+
+    const margin=Math.max(
+      12,
+      Math.floor(width*0.02)
+    );
+
+    /*
+      黒板は横長になりすぎない比率。
+    */
+    let boardWidth=Math.floor(width*0.34*boardScale);
+
+    boardWidth=Math.min(
+      boardWidth,
+      width-margin*2
+    );
+
+    /*
+      高さは幅から決定。
+      説明6行分を常に確保する。
+    */
+    let boardHeight=Math.floor(boardWidth*0.82);
+
+    if(boardHeight>height-margin*2){
+      boardHeight=height-margin*2;
+      boardWidth=Math.floor(boardHeight/0.82);
+    }
+
+    const travelX=Math.max(0,width-boardWidth-margin*2);
+    const travelY=Math.max(0,height-boardHeight-margin*2);
+    const x=margin+travelX*boardPosition.x;
+    const y=margin+travelY*boardPosition.y;
+    boardBounds={x:x/width,y:y/height,w:boardWidth/width,h:boardHeight/height,marginX:margin/width,marginY:margin/height};
+
+
+    /*
+      工事黒板らしい緑色
+    */
+    ctx.fillStyle="#176b45";
+
+    ctx.fillRect(
+      x,
+      y,
+      boardWidth,
+      boardHeight
+    );
+
+
+    /*
+      線の太さ
+    */
+    const lineWidth=Math.max(
+      2,
+      Math.floor(boardWidth*0.006)
+    );
+
+    ctx.strokeStyle="#ffffff";
+    ctx.lineWidth=lineWidth;
+
+
+    /*
+      外枠
+    */
+    ctx.strokeRect(
+      x,
+      y,
+      boardWidth,
+      boardHeight
+    );
+
+
+    /*
+      データ
+    */
+    const project=
+      $("project").value.trim()||"未入力";
+
+    const work=
+      $("work").value.trim()||"未入力";
+
+    const number=
+      pointText()||"－";
+
+
+    /*
+      説明は必ず6行固定。
+      入力されていない行は空欄。
+      自動折り返しはしない。
+    */
+    const rawDesc=$("desc").value;
+
+    const descLines=
+      rawDesc.split(/\r?\n/).slice(0,6);
+
+    while(descLines.length<6){
+      descLines.push("");
+    }
+
+
+    /*
+      左側の項目欄の幅
+    */
+    const labelWidth=
+      Math.floor(boardWidth*0.25);
+
+    /*
+      ★重要
+      縦線はこれ1本だけ。
+      上から下まで同じX座標。
+    */
+    const verticalX=
+      x+labelWidth;
+
+    ctx.beginPath();
+    ctx.moveTo(verticalX,y);
+    ctx.lineTo(verticalX,y+boardHeight);
+    ctx.stroke();
+
+
+    /*
+      全体を9段に分ける。
+
+      1 工事名
+      2 工種
+      3 測点
+      4 説明1
+      5 説明2
+      6 説明3
+      7 説明4
+      8 説明5
+      9 説明6
+    */
+    const rowHeight=
+      boardHeight/9;
+
+
+    /*
+      横線。
+      工事名・工種・測点の下は全面。
+      説明欄内は右側だけ。
+    */
+
+    for(let i=1;i<=8;i++){
+
+      const lineY=
+        y+rowHeight*i;
+
+      ctx.beginPath();
+
+      if(i<=3){
+        ctx.moveTo(x,lineY);
+      }else{
+        ctx.moveTo(verticalX,lineY);
+      }
+
+      ctx.lineTo(
+        x+boardWidth,
+        lineY
+      );
+
+      ctx.stroke();
+    }
+
+
+    /*
+      文字設定
+    */
+    const fontSize=Math.max(
+      13,
+      Math.floor(rowHeight*0.43)
+    );
+
+    ctx.fillStyle="#ffffff";
+
+    ctx.font=
+      "bold "+fontSize+
+      'px "Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif';
+
+    ctx.textBaseline="middle";
+
+    const pad=Math.max(
+      6,
+      Math.floor(boardWidth*0.018)
+    );
+
+
+    /*
+      左項目名
+    */
+    const labelX=
+      x+pad;
+
+    const labelMaxWidth=
+      labelWidth-pad*2;
+
+    const valueX=
+      verticalX+pad;
+
+    const valueMaxWidth=
+      boardWidth-labelWidth-pad*2;
+
+
+    /*
+      各行中央のY座標
+    */
+    function centerY(row){
+      return y+
+        rowHeight*row+
+        rowHeight/2;
+    }
+
+
+    /*
+      左列
+    */
+    ctx.fillText(
+      fitText(ctx,"工事名",labelMaxWidth),
+      labelX,
+      centerY(0)
+    );
+
+    ctx.fillText(
+      fitText(ctx,"工　種",labelMaxWidth),
+      labelX,
+      centerY(1)
+    );
+
+    ctx.fillText(
+      fitText(ctx,"測　点",labelMaxWidth),
+      labelX,
+      centerY(2)
+    );
+
+    ctx.fillText(
+      fitText(ctx,"説　明",labelMaxWidth),
+      labelX,
+      centerY(3)
+    );
+
+
+    /*
+      右列
+    */
+    ctx.fillText(
+      fitText(ctx,project,valueMaxWidth),
+      valueX,
+      centerY(0)
+    );
+
+    ctx.fillText(
+      fitText(ctx,work,valueMaxWidth),
+      valueX,
+      centerY(1)
+    );
+
+    ctx.fillText(
+      fitText(ctx,number,valueMaxWidth),
+      valueX,
+      centerY(2)
+    );
+
+
+/*
+  説明6行
+  「実測」で始まる行だけ赤文字にする
+*/
+for(let i=0;i<6;i++){
+
+  const line=descLines[i].trim();
+
+  if(line.startsWith("実測")){
+    ctx.fillStyle="#ff3333";
+  }else{
+    ctx.fillStyle="#ffffff";
+  }
+
+  ctx.fillText(
+    fitText(
+      ctx,
+      descLines[i],
+      valueMaxWidth
+    ),
+    valueX,
+    centerY(3+i)
+  );
+}
+
+/*
+  文字色を白へ戻す
+*/
+ctx.fillStyle="#ffffff";
+
+}
+
+
+  return await canvasToBlob(canvas);
+}
+
+
+function showFile(file){
+  if(!file)return;
+
+  selectedFile=file;
+  invalidatePreview();
+
+  clearStatus();
+
+  const reader=new FileReader();
+
+  reader.onload=e=>{
+    $("preview").src=e.target.result;
+    $("preview").style.display="block";
+  };
+
+  reader.readAsDataURL(file);
+
+  $("saveBtn").disabled=false;
+}
+
+
+$("cameraBtn").onclick=()=>{
+  $("camera").click();
+};
+
+$("libraryBtn").onclick=()=>{
+  $("library").click();
+};
+
+
+$("camera").addEventListener(
+  "change",
+  e=>{
+    if(e.target.files[0]){
+      showFile(e.target.files[0]);
+    }
+  }
+);
+
+
+$("library").addEventListener(
+  "change",
+  e=>{
+    if(e.target.files[0]){
+      showFile(e.target.files[0]);
+    }
+  }
+);
+
+
+$("clearBtn").onclick=()=>{
+
+  selectedFile=null;
+  invalidatePreview();
+
+  $("camera").value="";
+  $("library").value="";
+
+  $("preview").src="";
+  $("preview").style.display="none";
+
+  $("saveBtn").disabled=true;
+
+  clearStatus();
+};
+
+
+$("saveBtn").onclick=async()=>{
+
+  if(!selectedFile){
+    alert("写真を選んでください。");
+    return;
+  }
+
+  const button=$("saveBtn");
+
+  button.disabled=true;
+  button.textContent="保存中…";
+
+  clearStatus();
+
+  try{
+
+    const blob=await makePhoto(
+      selectedFile,
+      $("board").checked
+    );
+
+
+    const number=currentPointNumber();
+    const pointName=$("pointName").value.trim();
+    const point=pointText();
+
+
+    await addPhoto({
+
+      project:
+        $("project").value.trim()||
+        "未入力",
+
+      work:
+        $("work").value.trim()||
+        "未入力",
+
+      desc:
+        $("desc").value.trim()||
+        "",
+
+      number:number,
+      pointName:pointName,
+      point:point,
+
+      createdAt:
+        new Date().toISOString(),
+
+      image:blob
+    });
+
+
+    if(document.querySelector('input[name="autoNumber"]:checked').value==='yes'){
+      $('pointNumber').value=Math.min(99,number+1);
+      refreshPoint();
+    }
+
+
+    selectedFile=null;
+    invalidatePreview();
+
+    $("camera").value="";
+    $("library").value="";
+
+    $("preview").src="";
+    $("preview").style.display="none";
+
+
+    await render();
+
+
+    showStatus(
+      "写真を保存しました 👍",
+      "ok"
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    showStatus(
+      "保存できませんでした："+
+      (error.message||"不明なエラー"),
+      "error"
+    );
+
+    alert(
+      "写真の保存中にエラーが発生しました。\n\n"+
+      (error.message||"")
+    );
+
+  }finally{
+
+    button.textContent=
+      "💾 写真を保存";
+
+    button.disabled=
+      !selectedFile;
+  }
+};
+
+
+async function render(){
+
+  const book=$("book");
+
+  try{
+
+    const photos=
+      await getPhotos();
+
+
+    if(!photos.length){
+
+      book.innerHTML=
+        '<div class="empty">'+
+        'まだ写真がありません。'+
+        '</div>';
+
+      nextNumber=1;
+      return;
+    }
+
+
+    let maxNumber=0;
+
+    photos.forEach(p=>{
+
+      if(
+        typeof p.number==="number" &&
+        p.number>maxNumber
+      ){
+        maxNumber=p.number;
+      }
+    });
+
+
+    nextNumber=
+      maxNumber+1;
+
+
+    book.innerHTML="";
+
+
+    const reversed=
+      [...photos].reverse();
+
+
+    reversed.forEach(photo=>{
+
+      const item=
+        document.createElement("div");
+
+      item.className=
+        "photoItem";
+
+
+      const img=
+        document.createElement("img");
+
+
+      const url=
+        URL.createObjectURL(
+          photo.image
+        );
+
+      img.src=url;
+
+      img.onload=()=>{
+        URL.revokeObjectURL(url);
+      };
+
+
+      const meta=
+        document.createElement("div");
+
+      meta.className=
+        "meta";
+
+
+      const numberText=photo.point || (photo.number ? "No."+photo.number : "－");
+
+
+      meta.innerHTML=
+        "<b>工事名：</b>"+
+        escapeHTML(photo.project)+
+        "<br>"+
+
+        "<b>工種：</b>"+
+        escapeHTML(photo.work)+
+        "<br>"+
+
+        "<b>測点：</b>"+
+        escapeHTML(numberText)+
+        "<br>"+
+
+        "<b>説明：</b>"+
+        escapeHTML(photo.desc||"－");
+
+
+      const del=
+        document.createElement("button");
+
+      del.className=
+        "danger";
+
+      del.style.marginTop=
+        "10px";
+
+      del.textContent=
+        "この写真を削除";
+
+
+      del.onclick=async()=>{
+
+        if(
+          !confirm(
+            "この写真を削除しますか？"
+          )
+        ){
+          return;
+        }
+
+        try{
+
+          await deletePhoto(
+            photo.id
+          );
+
+          await render();
+
+        }catch(error){
+
+          alert(
+            "削除できませんでした。"
+          );
+        }
+      };
+
+
+      item.appendChild(img);
+      item.appendChild(meta);
+      item.appendChild(del);
+
+      book.appendChild(item);
+    });
+
+  }catch(error){
+
+    console.error(error);
+
+    book.innerHTML=
+      '<div class="empty">'+
+      '写真帳を読み込めませんでした。'+
+      '</div>';
+  }
+}
+
+
+function escapeHTML(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+
+let boardScale = 1.0;
+
+const boardMinus = document.getElementById("boardMinus");
+const boardPlus = document.getElementById("boardPlus");
+const boardSize = document.getElementById("boardSize");
+
+function updateBoardSize(){
+  boardSize.textContent = Math.round(boardScale * 100) + "%";
+}
+
+boardMinus.addEventListener("click", ()=>{
+  boardScale = Math.max(0.7, boardScale - 0.1);
+  updateBoardSize();
+});
+
+boardPlus.addEventListener("click", ()=>{
+  boardScale = Math.min(1.0, boardScale + 0.1);
+  updateBoardSize();
+});
+
+
+
+// 入力内容は写真保存後も保持。プレビューは変更時に再生成します。
+$('pointMinus').onclick=()=>{$('pointNumber').value=Math.max(1,currentPointNumber()-1);refreshPoint();};
+$('pointPlus').onclick=()=>{$('pointNumber').value=Math.min(99,currentPointNumber()+1);refreshPoint();};
+$('pointNumber').addEventListener('input',refreshPoint);
+$('pointName').addEventListener('input',refreshPoint);
+['project','work','desc','board'].forEach(id=>$(id).addEventListener('input',invalidatePreview));
+['boardMinus','boardPlus'].forEach(id=>$(id).addEventListener('click',invalidatePreview));
+async function refreshBoardPreview(){
+ if(!selectedFile){showStatus('先に写真を選んでください。','error');return;}
+ const button=$('boardPreviewBtn');button.disabled=true;
+ try{
+   const blob=await makePhoto(selectedFile,$('board').checked);
+   const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(blob);});
+   $('boardPreview').src=data;$('boardPreview').style.display='block';
+   showStatus('保存前プレビューを表示しました。','ok');
+ }catch(e){showStatus('プレビューできませんでした：'+e.message,'error');}
+ finally{button.disabled=false;}
+}
+$('boardPreviewBtn').onclick=refreshBoardPreview;
+
+// 黒板の四隅配置とドラッグ操作。保存される写真にも同じ座標を使用。
+$('boardCorners').addEventListener('click',async e=>{const b=e.target.closest('[data-corner]');if(!b)return;const c=b.dataset.corner;setBoardPosition(c.endsWith('l')?0:1,c.startsWith('t')?0:1);if(selectedFile)await refreshBoardPreview();});
+const boardImg=$('boardPreview');
+let dragging=false,dragOffset={x:0,y:0},dragMoved=false;
+boardImg.addEventListener('pointerdown',e=>{
+ if(!$('board').checked||!boardBounds||boardImg.style.display==='none')return;
+ const r=boardImg.getBoundingClientRect();const px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+ if(px<boardBounds.x||px>boardBounds.x+boardBounds.w||py<boardBounds.y||py>boardBounds.y+boardBounds.h)return;
+ dragging=true;dragMoved=false;dragOffset={x:px-boardBounds.x,y:py-boardBounds.y};boardImg.setPointerCapture(e.pointerId);boardImg.style.cursor='grabbing';
+});
+boardImg.addEventListener('pointermove',e=>{
+ if(!dragging||!boardBounds)return;const r=boardImg.getBoundingClientRect();
+ const px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+ const tx=Math.max(0,1-boardBounds.w-2*boardBounds.marginX),ty=Math.max(0,1-boardBounds.h-2*boardBounds.marginY);
+ setBoardPosition(tx?((px-dragOffset.x-boardBounds.marginX)/tx):0,ty?((py-dragOffset.y-boardBounds.marginY)/ty):0);dragMoved=true;
+});
+async function endBoardDrag(){if(!dragging)return;dragging=false;boardImg.style.cursor='grab';if(dragMoved&&selectedFile)await refreshBoardPreview();}
+boardImg.addEventListener('pointerup',endBoardDrag);boardImg.addEventListener('pointercancel',endBoardDrag);
+
+// ZIP形式（無圧縮）をブラウザだけで作成します。外部サービスへの送信はありません。
+const zipEncoder=new TextEncoder();
+const crcTable=(()=>{
+  const table=new Uint32Array(256);
+  for(let n=0;n<256;n++){
+    let c=n;
+    for(let k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);
+    table[n]=c>>>0;
+  }
+  return table;
+})();
+function crc32(bytes){
+  let c=0xFFFFFFFF;
+  for(const b of bytes)c=crcTable[(c^b)&255]^(c>>>8);
+  return (c^0xFFFFFFFF)>>>0;
+}
+function zipSafeName(value){
+  const cleaned=String(value||"未入力").replace(/[\\/:*?"<>|\x00-\x1f]/g,"_").replace(/^\.+|\.+$/g,"").trim();
+  return (cleaned||"未入力").slice(0,70);
+}
+function zipCsvCell(value){
+  return '"'+String(value??"").replaceAll('"','""')+'"';
+}
+function zipHeader(size){return new DataView(new ArrayBuffer(size));}
+function zipFileName(project,work,index,number){
+  const no=number!=null?`No.${number}`:`写真${index}`;
+  return `${zipSafeName(project)}/${zipSafeName(work)}/${no}_${String(index).padStart(4,"0")}.jpg`;
+}
+async function buildZip(entries){
+  const chunks=[],central=[];
+  let offset=0;
+  for(const entry of entries){
+    const name=zipEncoder.encode(entry.name);
+    const data=entry.data instanceof Uint8Array?entry.data:new Uint8Array(await entry.data.arrayBuffer());
+    const crc=crc32(data);
+    const local=zipHeader(30);
+    local.setUint32(0,0x04034b50,true);
+    local.setUint16(4,20,true);
+    local.setUint16(6,0x0800,true); // UTF-8 filenames
+    local.setUint16(8,0,true); // store, no compression
+    local.setUint32(14,crc,true);
+    local.setUint32(18,data.length,true);
+    local.setUint32(22,data.length,true);
+    local.setUint16(26,name.length,true);
+    chunks.push(local.buffer,name,data);
+    const cd=zipHeader(46);
+    cd.setUint32(0,0x02014b50,true);
+    cd.setUint16(4,20,true);
+    cd.setUint16(6,20,true);
+    cd.setUint16(8,0x0800,true);
+    cd.setUint16(10,0,true);
+    cd.setUint32(16,crc,true);
+    cd.setUint32(20,data.length,true);
+    cd.setUint32(24,data.length,true);
+    cd.setUint16(28,name.length,true);
+    cd.setUint32(42,offset,true);
+    central.push(cd.buffer,name);
+    offset+=30+name.length+data.length;
+    if(offset>0xFFFFFFFF)throw new Error("ZIPが4GBを超えるため出力できません。");
+  }
+  if(entries.length>65535)throw new Error("写真の数がZIP形式の上限を超えました。");
+  const centralStart=offset;
+  for(const c of central){chunks.push(c);offset+=c.byteLength;}
+  const end=zipHeader(22);
+  end.setUint32(0,0x06054b50,true);
+  end.setUint16(8,entries.length,true);
+  end.setUint16(10,entries.length,true);
+  end.setUint32(12,offset-centralStart,true);
+  end.setUint32(16,centralStart,true);
+  chunks.push(end.buffer);
+  return new Blob(chunks,{type:"application/zip"});
+}
+$("exportZipBtn").addEventListener("click",async()=>{
+  const button=$("exportZipBtn"),status=$("exportStatus");
+  button.disabled=true;
+  status.className="status ok";
+  status.textContent="ZIPファイルを作成しています…";
+  try{
+    const photos=await getPhotos();
+    if(!photos.length)throw new Error("保存済みの写真がありません。");
+    const entries=[],rows=[["ファイル名","工事名","工種","測点","説明"]];
+    const used=new Set();
+    for(let i=0;i<photos.length;i++){
+      const p=photos[i];
+      let name=zipFileName(p.project,p.work,i+1,p.number);
+      if(used.has(name))name=name.replace(/\.jpg$/,`_${i+1}.jpg`);
+      used.add(name);
+      entries.push({name,data:p.image});
+      rows.push([name,p.project,p.work,p.point || (p.number==null?"":`No.${p.number}`),p.desc]);
+    }
+    const csv="\uFEFF"+rows.map(row=>row.map(zipCsvCell).join(",")).join("\r\n");
+    entries.push({name:"写真一覧.csv",data:zipEncoder.encode(csv)});
+    const zip=await buildZip(entries);
+    const url=URL.createObjectURL(zip);
+    const link=document.createElement("a");
+    link.href=url;
+    link.download="工事写真_工種別.zip";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+    status.textContent=`${photos.length}枚のZIPを作成しました。保存先をご確認ください。`;
+  }catch(error){
+    status.className="status error";
+    status.textContent="出力できませんでした："+(error.message||"不明なエラー");
+  }finally{button.disabled=false;}
+});
+
+updateBoardSize();
+refreshPoint();
+render();
+</script>
+
+</body>
+</html>
